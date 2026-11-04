@@ -15,6 +15,8 @@ Design and pre-registration stage. No experiments have run yet.
 |---|---|
 | `preregistration.md` | Frozen pre-registration (tag `prereg-v1`) |
 | `prereg_addendum_v1_1.md` | Addendum v1.1: predictions of the transition points, a mismatch-gated acquisition arm, synthetic-powered conformal intervals (frozen, tag `prereg-v1.1`) |
+| `prereg_addendum_v1_2.md` | Addendum v1.2: horizon-resolved transition, identify vs correct, measured misspecification amplification (frozen, tag `prereg-v1.2`) |
+| `gap_mining_2026-11-04.md` | Future-work gaps in recent papers that the study can answer |
 | `project_goal_v2.md` | Goal, abstract, scope and plan, with a dated changelog |
 | `week1_novelty_multifidelity.md` | Full-text novelty check of the closest papers |
 | `reports/` | Literature review of novelty gaps and upgrades |
@@ -23,4 +25,4 @@ Design and pre-registration stage. No experiments have run yet.
 
 ## Pre-registration
 
-Analyses, hypotheses and success criteria are fixed by git tags before the data they concern exist. Order: `prereg-v1`, then `prereg-v1.1` (before the pilot), then `pred-v1` (predicted numbers computed from pilot seed 0, before the main grid). Changes after freezing are listed with dates in section 11 of `preregistration.md`.
+Analyses, hypotheses and success criteria are fixed by git tags before the data they concern exist. Order: `prereg-v1`, then `prereg-v1.1` and `prereg-v1.2` (before the pilot), then `pred-v1` (predicted numbers computed from pilot seed 0, before the main grid). Changes after freezing are listed with dates in section 11 of `preregistration.md`.
