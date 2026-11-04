@@ -137,4 +137,4 @@ Fit time per network is also measured here; if the projected compute exceeds 425
 
 Any change after freezing is listed here with the date, what changed and why, before the affected results are looked at.
 
-- (none yet)
+- 2026-11-04 (before any pilot run): addendum `prereg_addendum_v1_1.md` (tag `prereg-v1.1` once committed). Adds frozen predictions P-A (RQ1 transition, Model A) and P-B (RQ2 transition and the S2 direction of H4, Model B); arm 8 (r-gated acquisition); discrepancy-augmented SPI; a new Family C of 3 tests with its own Holm correction; exploratory blocks; a cut order; and clarifies that "half its ranking ability" means the 4PL midpoint. Why: a post-freeze literature review showed H1 is largely computable from the design and the bare claim is published, so the contribution moves to predicting the transitions. Families A and B, systems, arms 1-7, seeds and metrics are unchanged.
