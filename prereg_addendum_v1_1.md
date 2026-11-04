@@ -1,6 +1,6 @@
 # Pre-registration addendum v1.1: Blind to the Missing Term
 
-Drafted 2026-11-04. Status: **draft, not yet frozen.** It is frozen by a git commit tagged `prereg-v1.1`, which must land before any pilot run is analysed (deadline 2026-11-24; pilot starts 2026-11-25). It amends `preregistration.md` (tag `prereg-v1`) and is logged in that file's section 11.
+Drafted 2026-11-04. Status: **frozen 2026-11-04** by the git commit tagged `prereg-v1.1`, before any pilot run (pilot starts 2026-11-25). It amends `preregistration.md` (tag `prereg-v1`) and is logged in that file's section 11.
 
 **Why this addendum exists.** A literature review after `prereg-v1` (report: `reports/Mismatch study novelty upgrade.md`) found that H1 is largely computable from the design and that the bare "uncertainty misses bias" claim is already published (arXiv:2505.23506, 2608.13633). This addendum adds frozen quantitative predictions for the transitions, two methods, and exploratory blocks. **Nothing in Families A and B, the systems, arms 1-7, seeds or metrics of `prereg-v1` changes.** No pilot or main-grid data existed when this was written.
 

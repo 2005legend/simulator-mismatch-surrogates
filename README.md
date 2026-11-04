@@ -14,7 +14,7 @@ Design and pre-registration stage. No experiments have run yet.
 | File | What it is |
 |---|---|
 | `preregistration.md` | Frozen pre-registration (tag `prereg-v1`) |
-| `prereg_addendum_v1_1.md` | Addendum v1.1: predictions of the transition points, a mismatch-gated acquisition arm, synthetic-powered conformal intervals (draft until tagged `prereg-v1.1`) |
+| `prereg_addendum_v1_1.md` | Addendum v1.1: predictions of the transition points, a mismatch-gated acquisition arm, synthetic-powered conformal intervals (frozen, tag `prereg-v1.1`) |
 | `project_goal_v2.md` | Goal, abstract, scope and plan, with a dated changelog |
 | `week1_novelty_multifidelity.md` | Full-text novelty check of the closest papers |
 | `reports/` | Literature review of novelty gaps and upgrades |
