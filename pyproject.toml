@@ -1,0 +1,18 @@
+[project]
+name = "mismatch"
+version = "0.1.0"
+description = "Blind to the Missing Term: simulator-mismatch study for neural physics surrogates"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "torch>=2.3",
+    "scikit-learn>=1.5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
