@@ -17,7 +17,7 @@ Four web searches. No paper found that sweeps mismatch strength for a neural PDE
 | arXiv:2510.22063 (Jain & Bates), 2210.16938, DEUP 2102.08501 | Ensembles capture procedural variance, not bias | States the mechanism; no ranking bound in r found |
 | Mikkola et al. 2023, rMFBO | "No harm" bound vs single-fidelity BO with unreliable sources (GP, optimisation) | Nearest neighbour of an arm-8 guarantee; full text not yet checked |
 
-Not yet done: full-text reads of the first two rows; a search of COLT/NeurIPS theory for a ranking bound under misspecification.
+Not yet done: a search of COLT/NeurIPS theory for a ranking bound under misspecification; a full-text check of rMFBO. The first two rows were read in full on 2026-11-13 (section 6).
 
 ## 2. The ranking law (derivation)
 
@@ -80,3 +80,20 @@ Feasible on the laptop. An MLP on a 4-parameter family is not a neural operator;
 - Headline candidate: "ranking under mismatch converges to an alignment the simulator cannot reveal; r and the spread of D set when; about n real points tell you which case you are in."
 - Theory section: T1 (limits), T2 (non-identifiability), T3 (exact squared-error identity), Model A for the curve in between, T4 for the real-data budget.
 - Open: is T1 + T2 "obvious"? T1 is elementary. The non-obvious content is the S1/S2 contrast, the spread-of-D dependence and a prediction of the whole curve.
+
+## 6. Full-text reads of the two closest PDE papers (2026-11-13)
+
+Read through a web-fetch pass of the arXiv HTML. For 2603.24948 the body of Section 5 (conclusion) was only seen as a summary, not verbatim.
+
+| | arXiv:2606.03469v2 (Ma, Boullé, Yang, Wu, Guo; 1 Aug 2026) | arXiv:2603.24948v1 (Zhou, Feng, Guo, Wu; 26 Mar 2026) |
+|---|---|---|
+| Method | Approximate physics prior plus a DeepONet correction operator, trained jointly with a DeepONet solution operator | Latent-variable model with a shared encoder, a neural-operator solution decoder and a neural-network correction decoder |
+| Misspecification | Diffusion-reaction (wrong reaction term), Burgers (extra cubic term; advection omitted; diffusion omitted), cavity flow (Newtonian prior for a power-law fluid), hyperelasticity (linear prior) | ODE and reaction-diffusion (wrong reaction term), channel and cavity flow (Newtonian model for a power-law fluid) |
+| Strength varied over levels? | No. One setting per case; sweeps are over data amounts and noise only | No. One fixed misspecification per case |
+| Approximation vs discrepancy split, or a ratio like r? | No | No |
+| UQ | Deep ensembles (5-10 members), shown as bands; no ranking or calibration metric | Monte Carlo over latent samples, compared with ensemble PINNs and B-PINNs; coverage judged by eye, no ranking or calibration metric |
+| Choice of true-system samples | None; fixed or random | None; random or uniform |
+| Theorems or bounds | None | None |
+| Stated future work | Time-dependent multiphysics, inverse problems, real experimental data | Correction is "weakly identifiable"; expressiveness and training cost of the correction network (from summary) |
+
+Reading: neither overlaps with the study. Both are correction methods at a single mismatch level, and both present ensemble or latent-sample uncertainty as informative without measuring whether it ranks the true error. That unmeasured step is what this project measures. Useful for the PDE stage: their test cases (Burgers with a term omitted, power-law cavity flow with a Newtonian prior) are ready-made mismatch pairs that reviewers in this area already accept, and a strength dial can be added to each (for example the power-law index n moving away from 1).

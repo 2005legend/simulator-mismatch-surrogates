@@ -1,0 +1,34 @@
+# Gap mining, second pass (2026-11-14): stated limitations in 2024-2026 papers, mapped to this project
+
+Follows `gap_mining_2026-11-04.md`. Two literature searches (2024 onward), five papers read from the returned pages (not always the full text), others by abstract only where marked. Earlier rows (Sale et al., Rizvi & Tomar, Tang et al., Amortila et al., SPI, Chen et al.) are not repeated.
+
+## 1. What each paper leaves open
+
+| Paper | What it does | Limitation or open point (theirs, or evident from their setup) | What this project can supply |
+|---|---|---|---|
+| Tangsali et al., NVIDIA, arXiv:2609.25430 (Sep 2026) | Compares GP, concrete MC dropout and deep ensembles on three industrial CAE datasets | Finds calibration, error ranking, response to shift and usefulness for derived quantities are separate properties; under shift, uncertainty grows more slowly than error (all "growth ratios" below one); conformal methods not evaluated; every error is measured against the solver, never against a physical system | The same separation measured against a true system with a dial. Their growth ratio, (σ ratio)/(error ratio), can be computed along ε at no cost and is an industry-recognised way to state the result |
+| Jaber et al., arXiv:2608.03360 (Aug 2026) | Model-form uncertainty for reduced-order models with conformal risk control | "Model-form" means the surrogate's structure, not the simulator's; guarantees need exchangeable calibration data; on advection the band width is negatively correlated with the error (about −0.75): right scale, wrong location | Independent evidence that calibrated is not ranked. Our alignment law is the same phenomenon one level up (simulator vs truth), with a proof of the limit |
+| Fock, arXiv:2608.16925 (Oct 2026, preprint) | Post-training diagnostic separating a wrong operator, a blind design and unfinished training | One parabolic benchmark; a small prediction error coexists with a coefficient 30% off; the diagnostic says "change the experiment" when the design is blind but gives no rule for choosing the next experiment; loses power above 7% noise; needs a named alternative operator | Our identify-vs-correct analysis (G2) is the pendulum version of the 30%-off coefficient. An acquisition rule that picks experiments exciting the missing term is the missing "which experiment" step |
+| Strouwen & Micluța-Câmpeanu, arXiv:2604.01231 (IFAC, Mar 2026) | Sequential experimental design for missing physics: a universal differential equation plus symbolic regression, experiments chosen to discriminate candidate structures | One bioreactor; three designed experiments against five random repeats; no space-filling baseline; no variation of how large the missing term is; no neural surrogate; hyperparameters fixed by hand (their stated future work) | Closest neighbour of an acquisition study with a dynamics-space correction. Open and answerable here: when does designed experimentation for missing physics beat a space-filling design, as a function of mismatch strength, with seeds and tests |
+| Wang, arXiv:2606.23215 (Jun 2026) | Localises where a physics model is wrong, identifies the missing term, tests significance | Needs a clean regime, a library containing the true term and a low-dimensional operating axis; data are given, not chosen; its motivating example is a friction law that fails only near stiction | Explains our S1/S2 contrast: Coulomb friction acts near rest, where the nominal ensemble is confident, so alignment is near zero. Reporting where in state space the discrepancy lives turns the contrast into a mechanism |
+| Ma et al. 2606.03469; Zhou et al. 2603.24948 | Correction methods for operator learning under misspecification | One mismatch level per case; ensemble or latent uncertainty shown as bands, never scored for ranking; no choice of observations; no theory | Already recorded in `stage1_notes_2026-11-13.md` section 6 |
+| Conformal prediction for neural operators: arXiv:2608.28515, 2606.09923, 2609.11935, 2606.08654 (**abstracts only**) | Split-conformal guarantees for operator surrogates | Guarantees rest on calibration data exchangeable with test data, and the calibration data come from the same simulator | Coverage of simulator-calibrated intervals against a true system as r grows, and how many real calibration points restore it. Already RQ1 signals 4 and 5; needs running on the operator system. Full-text check still required |
+| Parashar et al., MIT/NVIDIA, arXiv:2608.13719 | Proxy-corrected choice of real tests for failure discovery | Benefit of the proxy depends on proxy-target correlation (small at about 0.15, clear at about 0.5); no controlled dial | Our r and alignment are the controlled version of that observation |
+| Cruz-Martinez et al., arXiv:2608.13633 | Position paper: no single diagnostic can confirm correct specification | Calls for a battery of diagnostics and stress tests; gives no measurements | Motivation for the introduction |
+
+## 2. Gaps ranked for adoption in the 10-day window
+
+| ID | Gap | Why it helps | Extra cost | Recommendation |
+|---|---|---|---|---|
+| N1 | **Acquisition for a dynamics-space correction, across mismatch strength.** Arms: random, Sobol, nominal ensemble σ, disagreement among an ensemble of learned missing terms, state-space coverage | Keeps acquisition central with the correction that works; answers the open point in 2604.01231 with a space-filling baseline, a strength dial and statistics | High unless the fit is made faster: 85-150 s per fit now. Needs a speed test (warm starts, fewer iterations) before committing | Adopt if the speed test brings a fit under about 15 s; otherwise run on S2 only |
+| N2 | **Growth ratio along ε** and the calibrated-is-not-ranked statement | Ties the result to an industrial benchmark's own metric | None (analysis only) | Adopt |
+| N3 | **Where the discrepancy lives:** discrepancy magnitude and nominal σ over the (angle, velocity) plane for S1 and S2 | Mechanism for the alignment contrast; one figure | None (simulator only) | Adopt |
+| N4 | **Conformal coverage under mismatch on the operator system** | Speaks to four 2026 conformal-operator papers | Small once system 3 exists | Adopt with system 3 |
+| N5 | Wrong-operator diagnostic (Fock) applied to the identified damping | A second reading of G2 | 1-2 days | Skip in this window; cite |
+| N6 | Symbolic recovery of the missing term | Crowded (SINDy family, LISDD) | Days | Skip |
+
+## 3. Caveats
+
+- The conformal-operator row rests on abstracts. Do not write a claim about those papers before reading them.
+- For 2608.16925, 2608.03360 and 2609.25430 the tool returned the most relevant pages, not every page.
+- N1's premise (design can matter for the dynamics correction) is supported by one dev-seed observation on S2 at high ε and contradicted on S1, where eight Sobol trajectories already suffice.
