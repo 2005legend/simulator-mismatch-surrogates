@@ -28,6 +28,19 @@ def residual_score(traj, thetas, t_grid=config.T_GRID):
     return np.mean(np.abs(ode_residual(traj, thetas, t_grid)[:, _EDGE:-_EDGE]), axis=1)
 
 
+def residual_profile(traj, thetas, t_grid=config.T_GRID):
+    """Absolute residual at every time point, (n, T), for averaging over a prefix window."""
+    return np.abs(ode_residual(traj, thetas, t_grid))
+
+
+def windowed_residual_score(profile, k):
+    """Mean absolute residual over the interior points of the first k time points.
+
+    With k = T this equals `residual_score`.
+    """
+    return profile[:, _EDGE:k - _EDGE].mean(axis=1)
+
+
 def spline_residual_score(traj, thetas, t_grid=config.T_GRID, lam=None):
     """Same score on noisy observed trajectories, with derivatives from a smoothing spline.
 

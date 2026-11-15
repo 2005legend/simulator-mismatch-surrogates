@@ -16,12 +16,14 @@ Norms are relative L2 over the trajectory, normalised by ||f_true||.
 
 import numpy as np
 from scipy.stats import spearmanr
+
+from mismatch import config
 from sklearn.metrics import roc_auc_score
 
 from mismatch.acquisition import DISC_CFG
 from mismatch.errors import decompose, rel_norm
 from mismatch.gp import PCAGP
-from mismatch.signals import residual_score
+from mismatch.signals import residual_profile, residual_score, windowed_residual_score
 from mismatch.simulators import simulate_batch, sobol_thetas, stream_seed
 from mismatch.surrogate import Ensemble
 
@@ -85,13 +87,71 @@ def _interval_record(name, n_cal, scale, E, q):
             "width": float(np.mean(q * scale))}
 
 
+WINDOWS = (2.0, 4.0, 6.0, 8.0, 10.0)      # prefix horizons in seconds (addendum v1.2, G1)
+
+
+def debiased_discrepancy(y, f_nom, sigma_obs):
+    """Relative norm of the discrepancy at observed points, with the noise energy removed.
+
+    sqrt(max(||y - f_nom||^2 - T sigma_obs^2, 0)) / ||y||, as in addendum v1.1 section 4.
+    """
+    t = y.shape[1]
+    sq = np.sum((y - f_nom) ** 2, axis=1) - t * np.asarray(sigma_obs) ** 2
+    return np.sqrt(np.maximum(sq, 0.0)) / np.linalg.norm(y, axis=1)
+
+
+def d3_records(sig, dhat, n_cal_true, seed, n_boot=1000, level=0.90):
+    """Addendum v1.5 D3: does the signal's correlation with the observed discrepancy norm
+    come out positive from n real points? Spearman correlation, percentile-bootstrap CI over
+    the n points; `aligned` means the lower end of the CI is above 0."""
+    out = []
+    for n in n_cal_true:
+        s, d = np.asarray(sig[:n]), np.asarray(dhat[:n])
+        with np.errstate(all="ignore"):
+            rho = float(spearmanr(s, d)[0])
+            rng = np.random.default_rng([int(seed) % (2 ** 32), n])
+            boots = []
+            for _ in range(n_boot):
+                idx = rng.integers(0, n, size=n)
+                if len(np.unique(idx)) < 3:
+                    continue
+                b = spearmanr(s[idx], d[idx])[0]
+                if np.isfinite(b):
+                    boots.append(b)
+        if len(boots) > 20:
+            lo, hi = (float(v) for v in np.quantile(boots, [(1 - level) / 2, 1 - (1 - level) / 2]))
+        else:
+            lo = hi = float("nan")
+        out.append({"signal": "d3", "n_cal": n, "rho_hat": rho, "ci_lo": lo, "ci_hi": hi,
+                    "aligned": bool(lo > 0)})
+    return out
+
+
+def _finite(x):
+    x = float(x)
+    return x if np.isfinite(x) else None
+
+
+def cell_summary(A, D, r):
+    """Quantities for addendum v1.5 D4 (does the transition track kappa = rms(a)/sd(d)?)."""
+    rms_a, sd_d, mean_d = float(np.sqrt(np.mean(A ** 2))), float(np.std(D)), float(np.mean(D))
+    return {"signal": "cell_summary", "n_cal": 0, "r": r, "rms_a": rms_a, "sd_d": sd_d,
+            "mean_d": mean_d, "cv_d": _finite(sd_d / mean_d) if mean_d > 0 else None,
+            "kappa": _finite(rms_a / sd_d) if sd_d > 0 else None,
+            "median_a": float(np.median(A)), "median_d": float(np.median(D))}
+
+
 def rq1_cell(nominal, mc_model, test_thetas, f_true, oracle, system_seed, include_true_data=True,
-             n_mc=50, disc_members=5, n_cal_true=N_CAL_TRUE, nominal_sim=None):
+             n_mc=50, disc_members=5, n_cal_true=N_CAL_TRUE, nominal_sim=None, d3=False,
+             return_arrays=False):
     """All RQ1 records for one (system, eps, n_nom, seed) cell.
 
     `f_true` are noise-free true trajectories on the test set; `oracle` returns noisy true
     trajectories for calibration points. `nominal_sim(thetas)` simulates the nominal system.
-    With include_true_data=False only the simulator-only signals (1-4) are computed.
+    With include_true_data=False only the simulator-only signals (1-4) are computed; `d3`
+    adds the real-point records of addendum v1.5 (needs the oracle). With return_arrays the
+    result is (records, arrays), arrays holding the per-test-point values: relative norms
+    A, D, E, the three signals, and the same restricted to each prefix window in WINDOWS.
     """
     nominal_sim = nominal_sim or (lambda th: simulate_batch(th, "S1", 0.0))
     f_nom = nominal_sim(test_thetas)
@@ -105,6 +165,22 @@ def rq1_cell(nominal, mc_model, test_thetas, f_true, oracle, system_seed, includ
     signals = {"ens_sigma": ens, "mc_sigma": mc.mean(axis=1),
                "ode_resid": residual_score(mean, test_thetas)}
     out = [_rank_record(name, 0, sig, E, A, D, r) for name, sig in signals.items()]
+    out.append(cell_summary(A, D, r))
+
+    arrays = None
+    if return_arrays:
+        profile = residual_profile(mean, test_thetas)
+        arrays = {"A": A, "D": D, "E": E, "ens_sigma": ens, "mc_sigma": signals["mc_sigma"],
+                  "ode_resid": signals["ode_resid"]}
+        dt = config.T_GRID[1] - config.T_GRID[0]
+        for h in WINDOWS:
+            k = int(round(h / dt)) + 1                       # points 0 .. h
+            nrm = np.linalg.norm(f_true[:, :k], axis=1)
+            for key, x in (("A", a), ("D", d), ("E", e)):
+                arrays[f"{key}_{int(h)}"] = np.linalg.norm(x[:, :k], axis=1) / nrm
+            arrays[f"ens_sigma_{int(h)}"] = sigma[:, :k].mean(axis=1)
+            arrays[f"mc_sigma_{int(h)}"] = mc[:, :k].mean(axis=1)
+            arrays[f"ode_resid_{int(h)}"] = windowed_residual_score(profile, k)
 
     # Gaussian intervals from sigma (relative norm), coverage against the total error
     for name, traj_sigma in (("ens_sigma", sigma), ("mc_sigma", mc)):
@@ -118,11 +194,19 @@ def rq1_cell(nominal, mc_model, test_thetas, f_true, oracle, system_seed, includ
     q = conformal_quantile(cal_err / sigma_rel(cal_sigma, cal_mean))
     out.append(_interval_record("conf_nom", 0, sigma_rel(sigma, mean), E, q))
 
-    if not include_true_data:
-        return out
+    def finish():
+        return (out, arrays) if return_arrays else out
+
+    if not include_true_data and not d3:
+        return finish()
 
     cal_all = sobol_thetas(max(n_cal_true), seed=stream_seed(system_seed, "calibration", 1))
-    y_all, _ = oracle(cal_all)
+    y_all, s_all = oracle(cal_all)
+    if d3:
+        dhat = debiased_discrepancy(y_all, nominal_sim(cal_all), s_all)
+        out += d3_records(nominal.predict(cal_all)[1].mean(axis=1), dhat, n_cal_true, system_seed)
+    if not include_true_data:
+        return finish()
     resid_all = y_all - nominal.predict(cal_all)[0]
     for n in n_cal_true:
         x_cal, y_cal, resid = cal_all[:n], y_all[:n], resid_all[:n]
@@ -138,4 +222,4 @@ def rq1_cell(nominal, mc_model, test_thetas, f_true, oracle, system_seed, includ
                                 E, A, D, r))
         gp = PCAGP(seed=stream_seed(system_seed, "gp", n)).fit(x_cal, resid)
         out.append(_rank_record("gp_std", n, np.sqrt(gp.predict(test_thetas)[1]), E, A, D, r))
-    return out
+    return finish()
