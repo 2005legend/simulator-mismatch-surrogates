@@ -164,3 +164,21 @@ def test_horizon_option_scores_only_first_points(small_problem):
     # same Sobol points, different scored horizon -> different error
     np.testing.assert_allclose(out[2]["thetas"], full[2]["thetas"])
     assert out[2]["uncorrected"]["median"] != full[2]["uncorrected"]["median"]
+
+
+def test_arms_share_fit_noise_on_identical_data(small_problem):
+    out = run_cell(small_problem)
+    first = {arm: res["log"][0]["median"] for arm, res in out.items()}
+    assert len(set(first.values())) == 1, first      # same 8 points, same seed, same error
+
+
+def test_stream_seeds_are_independent():
+    from mismatch.simulators import stream_seed
+    seeds = [stream_seed(s, p, i) for s in (0, 1, 2, 101) for p in
+             ("train", "test", "design", "pool") for i in (0, 1, 2)]
+    assert len(set(seeds)) == len(seeds)
+    a = sobol_thetas(56, seed=stream_seed(0, "design"))
+    b = sobol_thetas(512, seed=stream_seed(0, "train"))[:56]
+    assert not np.allclose(a, b)
+    assert not np.allclose(sobol_thetas(500, seed=stream_seed(3, "test")),
+                           sobol_thetas(512, seed=stream_seed(4, "train"))[:500])

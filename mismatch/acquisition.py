@@ -15,7 +15,7 @@ from mismatch import config
 from mismatch.gp import PCAGP, ScalarGP
 from mismatch.metrics import budget_auc, rel_errors, summarize
 from mismatch.signals import residual_score, spline_residual_score
-from mismatch.simulators import simulate_batch, sobol_thetas
+from mismatch.simulators import simulate_batch, sobol_thetas, stream_seed
 from mismatch.surrogate import Ensemble, FitConfig
 
 ARMS = {1: "random", 2: "sobol", 3: "nominal_sigma", 4: "nominal_residual",
@@ -115,11 +115,12 @@ class Problem:
 
     def design(self):
         """Initial points followed by the Sobol continuation used by arm 2."""
-        return sobol_thetas(self.n_init + self.rounds * self.batch, seed=self.seed * 1000)
+        return sobol_thetas(self.n_init + self.rounds * self.batch,
+                            seed=stream_seed(self.seed, "design"))
 
     def pool(self, rnd):
         """Candidate pool for round rnd (1-based), shared by all arms."""
-        return sobol_thetas(self.pool_size, seed=self.seed * 1000 + rnd)
+        return sobol_thetas(self.pool_size, seed=stream_seed(self.seed, "pool", rnd))
 
     def pool_nominal_error(self, rnd):
         """Median relative approximation error over the round's pool (arm 8 denominator)."""
@@ -168,7 +169,8 @@ def run_arm(problem, arm, init_obs=None):
 
     log = []
     for rnd in range(p.rounds + 1):
-        fit_seed = p.seed * 10000 + arm * 100 + rnd
+        fit_seed = p.seed * 10000 + rnd                  # same for every arm: paired fits
+        score_seed = p.seed * 10000 + arm * 100 + rnd    # arm-specific, for score models only
         disc = Ensemble(n_out=y.shape[1], n_members=p.disc_members, cfg=p.disc_cfg,
                         base_seed=fit_seed).fit(x, y - p.nom(x)[0])
         err = rel_errors(nominal_test + disc.predict(p.test_thetas)[0], truth)
@@ -191,7 +193,7 @@ def run_arm(problem, arm, init_obs=None):
         elif rule == 2:
             new_x = sobol_block
         else:
-            scores = _scores(rule, p, pool, x, y, disc, deup, fit_seed)
+            scores = _scores(rule, p, pool, x, y, disc, deup, score_seed)
             new_x = pool[sample_batch(scores, p.batch, p.k, rng)]
 
         new_y, new_sigma = p.oracle(new_x)

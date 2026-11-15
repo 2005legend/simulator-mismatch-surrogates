@@ -17,7 +17,8 @@ import numpy as np
 import torch
 
 from mismatch.acquisition import ARMS, Problem, make_oracle, run_arm
-from mismatch.simulators import simulate_batch, sobol_thetas
+from mismatch.metrics import rel_errors
+from mismatch.simulators import simulate_batch, sobol_thetas, stream_seed
 from mismatch.surrogate import Ensemble, FitConfig
 
 DEV_SEEDS = (999, 998, 997)
@@ -26,13 +27,13 @@ MULTIPLES = (1, 4)
 ARMS_RUN = (1, 2, 3, 4, 5, 6, 7)
 N_T = 81
 DISC = FitConfig(hidden=32, max_epochs=1500, min_val=10 ** 9)
-LOG = os.path.join("runs", "dev_arm_separation.jsonl")   # runs/ is git-ignored
+LOG = os.path.join("runs", "dev_arm_separation_v2.jsonl")   # runs/ is git-ignored
 
 
 def run_seed(seed):
     torch.set_num_threads(1)
-    train = sobol_thetas(512, seed=seed)
-    test = sobol_thetas(500, seed=seed + 5000)
+    train = sobol_thetas(512, seed=stream_seed(seed, "train"))
+    test = sobol_thetas(500, seed=stream_seed(seed, "test"))
     nominal = Ensemble(n_members=5, base_seed=seed).fit(train, simulate_batch(train, "S1", 0.0))
     out = {}
     for system in ("S1", "S2"):
@@ -42,7 +43,11 @@ def run_seed(seed):
                               test_thetas=test, test_true=simulate_batch(test, system, eps),
                               seed=seed, n_t=N_T, disc_cfg=DISC)
             init_obs = problem.oracle(problem.design()[:problem.n_init])
-            cell = {}
+            f_nom = simulate_batch(test, "S1", 0.0)[:, :N_T]
+            a = rel_errors(nominal.predict(test)[0][:, :N_T], f_nom)
+            d = rel_errors(f_nom, problem.test_true[:, :N_T])
+            cell = {-1: {"floor": float(np.median(a)), "d": float(np.median(d)),
+                         "r": float(np.median(d) / np.median(a))}}
             for arm in ARMS_RUN:
                 res = run_arm(problem, arm, init_obs)
                 cell[arm] = {"auc": res["budget_auc"], "final": res["log"][-1]["median"],
@@ -72,6 +77,10 @@ def main():
             list(pool.map(run_seed, todo))
     results = load_done()
     for cell in results[DEV_SEEDS[0]]:
+        meta = [results[s][cell][-1] for s in DEV_SEEDS]
+        print(f"\n{cell}: on the 4 s window, approximation floor "
+              f"{np.mean([m['floor'] for m in meta]):.4f}, discrepancy "
+              f"{np.mean([m['d'] for m in meta]):.4f}, r = {np.mean([m['r'] for m in meta]):.2f}")
         unc = np.mean([results[s][cell][2]["uncorrected"] for s in DEV_SEEDS])
         sob = np.mean([results[s][cell][2]["final"] for s in DEV_SEEDS])
         print(f"\n{cell}: uncorrected {unc:.4f}, Sobol at n = 56 {sob:.4f}")

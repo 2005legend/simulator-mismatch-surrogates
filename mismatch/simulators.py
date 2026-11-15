@@ -60,6 +60,20 @@ def simulate_batch(thetas, system="S1", eps=0.0, delta=config.DELTA_S2, n_jobs=1
     return np.stack(out)
 
 
+PURPOSES = {"train": 0, "test": 1, "design": 2, "pool": 3, "noise": 4, "calibration": 5}
+
+
+def stream_seed(seed, purpose, index=0):
+    """Independent integer seed for one purpose of one replication seed.
+
+    Scrambled Sobol with the same integer seed gives the same points, so using `seed` for
+    training data and `seed` (or seed + 1) for anything else makes the sets overlap or
+    become another replication's training set. Derive every stream from (seed, purpose).
+    """
+    seq = np.random.SeedSequence([int(seed), PURPOSES[purpose], int(index)])
+    return int(seq.generate_state(1)[0])
+
+
 def sobol_thetas(n, seed, low=config.BOX_LOW, high=config.BOX_HIGH, skip=0):
     """Scrambled Sobol points in the parameter box. `skip` continues a sequence."""
     sampler = qmc.Sobol(d=len(low), scramble=True, seed=seed)
