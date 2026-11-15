@@ -26,12 +26,15 @@ class FitConfig:
     patience: int = 150       # early stopping on a held-out split
     val_frac: float = 0.1
     min_val: int = 4          # never hold out fewer than this many points
+    dropout: float = 0.0      # > 0 only for the MC-dropout surrogate (prereg-v1 section 6)
 
 
 def _mlp(n_in, n_out, cfg):
     layers, width = [], n_in
     for _ in range(cfg.n_hidden_layers):
         layers += [nn.Linear(width, cfg.hidden), nn.SiLU()]
+        if cfg.dropout > 0:
+            layers.append(nn.Dropout(cfg.dropout))
         width = cfg.hidden
     layers.append(nn.Linear(width, n_out))
     return nn.Sequential(*layers)
@@ -94,6 +97,16 @@ class Member:
         self.fit_seconds = time.perf_counter() - start
         self.epochs_run = epoch + 1
         return self
+
+    def predict_mc(self, thetas, n_passes=50, seed=0):
+        """Stochastic forward passes with dropout active; returns (n_passes, n, T)."""
+        torch.manual_seed(seed)
+        x = torch.from_numpy(scale_inputs(thetas).astype(np.float32))
+        self.net.train()
+        with torch.no_grad():
+            out = np.stack([self.net(x).numpy() for _ in range(n_passes)])
+        self.net.eval()
+        return out * self.y_std + self.y_mean
 
     def predict(self, thetas):
         self.net.eval()
