@@ -35,8 +35,9 @@ class Term(nn.Module):
         return self.net(torch.stack([phi / np.pi, omega / 5.0], dim=1))[:, 0]
 
 
-def rollout(thetas, term=None):
-    """RK4 on the time grid for a batch of thetas (n, 4), as a tensor (n, 201)."""
+def rollout(thetas, term=None, return_omega=False):
+    """RK4 on the time grid for a batch of thetas (n, 4): phi as a tensor (n, 201), or
+    (phi, omega) when return_omega is set."""
     c, length, phi, omega = thetas.unbind(dim=1)
     k = config.G / length
 
@@ -44,7 +45,7 @@ def rollout(thetas, term=None):
         acc = -c * w - k * torch.sin(p)
         return w, acc + term(p, w) if term is not None else acc
 
-    out = [phi]
+    out, vel = [phi], [omega]
     for _ in range(N_STEPS):
         p1, w1 = f(phi, omega)
         p2, w2 = f(phi + 0.5 * DT * p1, omega + 0.5 * DT * w1)
@@ -53,13 +54,18 @@ def rollout(thetas, term=None):
         phi = phi + DT / 6 * (p1 + 2 * p2 + 2 * p3 + p4)
         omega = omega + DT / 6 * (w1 + 2 * w2 + 2 * w3 + w4)
         out.append(phi)
+        vel.append(omega)
+    if return_omega:
+        return torch.stack(out, dim=1), torch.stack(vel, dim=1)
     return torch.stack(out, dim=1)
 
 
-def simulate_with_term(thetas, term=None):
+def simulate_with_term(thetas, term=None, return_omega=False):
     """NumPy wrapper around `rollout` without gradients."""
     with torch.no_grad():
-        return rollout(torch.as_tensor(np.atleast_2d(thetas), dtype=torch.float64), term).numpy()
+        out = rollout(torch.as_tensor(np.atleast_2d(thetas), dtype=torch.float64), term,
+                      return_omega)
+    return tuple(o.numpy() for o in out) if return_omega else out.numpy()
 
 
 def _gm_targets(thetas, y, lam):
@@ -104,7 +110,7 @@ def refine_trajectory_matching(term, thetas, y, iters=20):
     return term
 
 
-def fit_term(thetas, y, seed=0, lbfgs_iters=20, lam=None):
+def fit_term(thetas, y, seed=0, lbfgs_iters=20, lam=None, gm_steps=500):
     """Two-step fit of the missing term from observed true trajectories."""
-    term = fit_gradient_matching(thetas, y, seed=seed, lam=lam)
+    term = fit_gradient_matching(thetas, y, seed=seed, steps=gm_steps, lam=lam)
     return refine_trajectory_matching(term, thetas, y, iters=lbfgs_iters)
