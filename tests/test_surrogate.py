@@ -63,3 +63,33 @@ def test_tiny_dataset_trains_without_validation_split():
     thetas, y = _toy_data(6)
     ens = Ensemble(n_out=20, n_members=1, cfg=FAST).fit(thetas, y)
     assert ens.members[0].epochs_run == FAST.max_epochs
+
+
+def test_batched_fit_matches_independent_fits():
+    thetas, y = _toy_data(96)
+    test_t, _ = _toy_data(30, seed=5)
+    cfg = FitConfig(hidden=32, max_epochs=80, patience=40)
+    a = Ensemble(n_out=20, n_members=3, cfg=cfg, base_seed=4, batched=False).fit(thetas, y)
+    b = Ensemble(n_out=20, n_members=3, cfg=cfg, base_seed=4, batched=True).fit(thetas, y)
+    pa, pb = a.member_predictions(test_t), b.member_predictions(test_t)
+    assert np.median(np.abs(pa - pb)) / np.abs(pa).mean() < 1e-3
+    assert [m.epochs_run for m in a.members] == [m.epochs_run for m in b.members]
+
+
+def test_batched_fit_without_validation_split_and_with_dropout_fallback():
+    thetas, y = _toy_data(6)
+    ens = Ensemble(n_out=20, n_members=3, cfg=FAST, base_seed=2).fit(thetas, y)
+    assert all(m.epochs_run == FAST.max_epochs for m in ens.members)
+    drop = FitConfig(hidden=32, max_epochs=40, patience=20, dropout=0.1)
+    thetas, y = _toy_data(48)
+    mc = Ensemble(n_out=20, n_members=2, cfg=drop, base_seed=2).fit(thetas, y)   # sequential path
+    assert mc.members[0].predict_mc(thetas[:4], n_passes=3).shape == (3, 4, 20)
+
+
+def test_batched_members_are_distinct_and_reproducible():
+    thetas, y = _toy_data(64)
+    a = Ensemble(n_out=20, n_members=3, cfg=FAST, base_seed=9).fit(thetas, y)
+    b = Ensemble(n_out=20, n_members=3, cfg=FAST, base_seed=9).fit(thetas, y)
+    pa, pb = a.member_predictions(thetas), b.member_predictions(thetas)
+    np.testing.assert_allclose(pa, pb, rtol=1e-5, atol=1e-6)
+    assert not np.allclose(pa[0], pa[1])
