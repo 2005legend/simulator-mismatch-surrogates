@@ -19,7 +19,8 @@ Design and pre-registration stage. No experiments have run yet.
 | `prereg_addendum_v1_3.md` | Addendum v1.3 (exploratory only): semigroup error as an RQ1 signal, design-clustering metrics (frozen, tag `prereg-v1.3`) |
 | `prereg_addendum_v1_4.md` | Addendum v1.4: predictions use the exact simulator discrepancy instead of a linear approximation (frozen, tag `prereg-v1.4`) |
 | `prereg_addendum_v1_5.md` | Addendum v1.5: disclosure of a development-seed look, the ranking limit, three secondary predictions, three extra ε levels (frozen, tag `prereg-v1.5`) |
-| `prereg_addendum_v1_6.md` | Addendum v1.6 (**draft, not frozen**): disclosure of later development-seed looks, implementation clarifications, Family D (acquisition for a dynamics-space correction), alignment-range predictions, cut order |
+| `prereg_addendum_v1_6.md` | Addendum v1.6: disclosure of later development-seed looks, implementation clarifications, Family F (acquisition for a learned missing term), alignment-range predictions R1, R1s, R3a, R3b, the cut-now list (frozen, tag `prereg-v1.6`) |
+| `plan_2026-11-15.md` | Plan for the working window: ledger of frozen obligations, code gaps, compute, schedule with gates, tiers, risks (approved plan; dependency order with gates, no fixed end date) |
 | `stage1_notes_2026-11-13.md` | Development notes: PDE literature first pass, ranking bound, 1D Burgers feasibility |
 | `mismatch/`, `tests/`, `scripts/` | Code: simulators, error split, diagnostics; run tests with `python -m pytest` |
 | `gap_mining_2026-11-04.md` | Future-work gaps in recent papers that the study can answer |
@@ -31,4 +32,4 @@ Design and pre-registration stage. No experiments have run yet.
 
 ## Pre-registration
 
-Analyses, hypotheses and success criteria are fixed by git tags before the data they concern exist. Order: `prereg-v1`, then `prereg-v1.1` to `prereg-v1.5` (before the pilot), then `pred-v1` (predicted numbers computed from pilot seed 0, before the main grid). Changes after freezing are listed with dates in section 11 of `preregistration.md`.
+Analyses, hypotheses and success criteria are fixed by git tags before the data they concern exist. Order: `prereg-v1`, then `prereg-v1.1` to `prereg-v1.6` (before the pilot), then `pred-v1` (predicted numbers computed from pilot seed 0, before the main grid). Changes after freezing are listed with dates in section 11 of `preregistration.md`.
