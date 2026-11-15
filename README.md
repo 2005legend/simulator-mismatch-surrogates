@@ -19,6 +19,7 @@ Design and pre-registration stage. No experiments have run yet.
 | `prereg_addendum_v1_3.md` | Addendum v1.3 (exploratory only): semigroup error as an RQ1 signal, design-clustering metrics (frozen, tag `prereg-v1.3`) |
 | `prereg_addendum_v1_4.md` | Addendum v1.4: predictions use the exact simulator discrepancy instead of a linear approximation (frozen, tag `prereg-v1.4`) |
 | `prereg_addendum_v1_5.md` | Addendum v1.5: disclosure of a development-seed look, the ranking limit, three secondary predictions, three extra ε levels (frozen, tag `prereg-v1.5`) |
+| `prereg_addendum_v1_6.md` | Addendum v1.6 (**draft, not frozen**): disclosure of later development-seed looks, implementation clarifications, Family D (acquisition for a dynamics-space correction), alignment-range predictions, cut order |
 | `stage1_notes_2026-11-13.md` | Development notes: PDE literature first pass, ranking bound, 1D Burgers feasibility |
 | `mismatch/`, `tests/`, `scripts/` | Code: simulators, error split, diagnostics; run tests with `python -m pytest` |
 | `gap_mining_2026-11-04.md` | Future-work gaps in recent papers that the study can answer |

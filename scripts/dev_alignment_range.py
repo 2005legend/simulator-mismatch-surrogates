@@ -43,6 +43,13 @@ def main():
         print("  per term: " + ", ".join(f"{n} {v:+.2f}" for n, v in res["per_term"].items()))
         print("  actual correlation with the true discrepancy: "
               + ", ".join(f"{s} {spearmanr(sig, d)[0]:+.2f}" for s, d in truth.items()), flush=True)
+        for system, family in (('S1', ('w|w|', 'w^3')), ('S2', ('tanh(w/0.1)', 'tanh(w/0.5)'))):
+            keep = [i for i, n in enumerate(names) if n not in family]
+            sub = alignment_range(sig, [names[i] for i in keep], responses[keep], base, seed=DEV_SEED)
+            actual = spearmanr(sig, truth[system])[0]
+            inside = sub['min'] <= actual <= sub['max']
+            print(f'  without the {system} family: range [{sub["min"]:+.2f}, {sub["max"]:+.2f}], '
+                  f'actual {actual:+.2f}, bracketed: {inside}', flush=True)
 
 
 if __name__ == "__main__":
