@@ -59,9 +59,9 @@ def run(seeds, n_noms, systems, mults, eps_ref, out, n_test=500, n_mc=50):
             t0 = time.perf_counter()
             train = sobol_thetas(n_nom, seed=stream_seed(seed, "train"))
             y_train = nominal_sim(train)
-            nominal = Ensemble(n_members=5, base_seed=seed).fit(train, y_train)
+            nominal = Ensemble(n_members=5, base_seed=stream_seed(seed, "nominal")).fit(train, y_train)
             mc_model = Ensemble(n_members=1, cfg=FitConfig(dropout=0.1),
-                                base_seed=seed * 10 + 7).fit(train, y_train)
+                                base_seed=stream_seed(seed, "mc")).fit(train, y_train)
             print(f"seed {seed} n_nom {n_nom}: surrogates fitted in "
                   f"{time.perf_counter() - t0:.0f} s", flush=True)
             for system, mult in todo:

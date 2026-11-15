@@ -133,9 +133,9 @@ def rq1_cell(nominal, mc_model, test_thetas, f_true, oracle, system_seed, includ
         out.append(_interval_record("conf_true", n, sigma_rel(sigma, mean), E, q_true))
         # discrepancy ensemble and GP fitted on the n residuals
         disc = Ensemble(n_out=resid.shape[1], n_members=disc_members, cfg=DISC_CFG,
-                        base_seed=system_seed * 10000 + n).fit(x_cal, resid)
+                        base_seed=stream_seed(system_seed, "disc", n)).fit(x_cal, resid)
         out.append(_rank_record("disc_sigma", n, disc.predict(test_thetas)[1].mean(axis=1),
                                 E, A, D, r))
-        gp = PCAGP(seed=system_seed).fit(x_cal, resid)
+        gp = PCAGP(seed=stream_seed(system_seed, "gp", n)).fit(x_cal, resid)
         out.append(_rank_record("gp_std", n, np.sqrt(gp.predict(test_thetas)[1]), E, A, D, r))
     return out

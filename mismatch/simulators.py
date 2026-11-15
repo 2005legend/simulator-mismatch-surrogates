@@ -60,7 +60,8 @@ def simulate_batch(thetas, system="S1", eps=0.0, delta=config.DELTA_S2, n_jobs=1
     return np.stack(out)
 
 
-PURPOSES = {"train": 0, "test": 1, "design": 2, "pool": 3, "noise": 4, "calibration": 5}
+PURPOSES = {"train": 0, "test": 1, "design": 2, "pool": 3, "noise": 4, "calibration": 5,
+            "nominal": 6, "mc": 7, "disc": 8, "fit": 9, "score": 10, "gp": 11}
 
 
 def stream_seed(seed, purpose, index=0):

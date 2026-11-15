@@ -23,6 +23,7 @@ from mismatch import config
 from mismatch.acquisition import Problem, sample_batch
 from mismatch.dynamics import fit_term, simulate_with_term
 from mismatch.metrics import budget_auc, rel_errors, summarize
+from mismatch.simulators import stream_seed
 
 ARMS_D = {"random": 1, "sobol": 2, "nominal_sigma": 3, "term_disagreement": 15,
           "state_coverage": 16}
@@ -71,7 +72,7 @@ def run_arm_d(problem, arm, init_obs=None, k_terms=5, lbfgs_iters=20, gm_steps=5
 
     log = []
     for rnd in range(p.rounds + 1):
-        fit_seed = p.seed * 10000 + rnd                  # same for every arm: paired fits
+        fit_seed = stream_seed(p.seed, "fit", rnd)       # same for every arm: paired fits
         term = fit_term(x, y, seed=fit_seed, lbfgs_iters=lbfgs_iters, gm_steps=gm_steps)
         learned = simulate_with_term(test, term)
         err = rel_errors(learned, truth)
@@ -90,8 +91,8 @@ def run_arm_d(problem, arm, init_obs=None, k_terms=5, lbfgs_iters=20, gm_steps=5
             if arm == "nominal_sigma":
                 scores = p.nominal.predict(pool)[1].mean(axis=1)
             elif arm == "term_disagreement":
-                score_seed = fit_seed * 100
-                terms = [term] + [fit_term(x, y, seed=score_seed + j, lbfgs_iters=lbfgs_iters,
+                terms = [term] + [fit_term(x, y, seed=stream_seed(p.seed, "score", rnd * 10 + j),
+                                           lbfgs_iters=lbfgs_iters,
                                            gm_steps=gm_steps) for j in range(1, k_terms)]
                 scores = term_disagreement_scores(terms, pool)
             elif arm == "state_coverage":

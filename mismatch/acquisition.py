@@ -169,8 +169,8 @@ def run_arm(problem, arm, init_obs=None):
 
     log = []
     for rnd in range(p.rounds + 1):
-        fit_seed = p.seed * 10000 + rnd                  # same for every arm: paired fits
-        score_seed = p.seed * 10000 + arm * 100 + rnd    # arm-specific, for score models only
+        fit_seed = stream_seed(p.seed, "fit", rnd)                 # same for every arm: paired fits
+        score_seed = stream_seed(p.seed, "score", arm * 100 + rnd)  # arm-specific, score models only
         disc = Ensemble(n_out=y.shape[1], n_members=p.disc_members, cfg=p.disc_cfg,
                         base_seed=fit_seed).fit(x, y - p.nom(x)[0])
         err = rel_errors(nominal_test + disc.predict(p.test_thetas)[0], truth)

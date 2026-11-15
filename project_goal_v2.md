@@ -57,6 +57,8 @@ Status: v2, 2026-11-04. Scope option B approved by the author on 2026-11-04. Rep
 
 - 2026-11-15: Author reviewed and approved the v1.6 numbers (R1 at 9 of 10 seeds, R1s tolerance 0.20, R3a and R3b at n = 16, Family F tests F1-F4 and stop rule, the cut-now list). `prereg_addendum_v1_6.md` frozen by tag `prereg-v1.6`, logged in section 11 of `preregistration.md`; the ten-day wording was removed from it. Cut now: model B and P-B, SPI and C2/C3 (Family C is C1 only), the k-curve, exact decomposition, arm 9, semigroup signal E1, extra n_nom acquisition cells, the 5% noise analysis. Next in the plan: code fixes and runner upgrades, the pilot on seeds 0, 101, 102, then `pred-v1`; the teammate's seven pieces run in parallel.
 
+- 2026-11-15: Model-seed fix done (v1.6 clarification 9). All network, correction-fit, score-model and GP seeds in `mismatch/acquisition.py`, `acquisition_d.py`, `rq1.py` and `scripts/run_rq1.py` now come from `stream_seed(seed, purpose, index)`; `stream_seed` gained the purposes nominal, mc, disc, fit, score and gp. New test: no collisions across 16 replication seeds (including 0 to 10, 101, 102) and all roles, and a check that the old arithmetic did collide (seed 8 nominal members equal seed 0 correction members at n = 8). Full suite 65 of 65 passing. Dev scripts still use the old seeds; they are not used for registered runs.
+
 ## Project goal
 
 Measure when the signals used to judge a physics surrogate (ensemble spread, conformal intervals calibrated on simulations, the residual of the governing equation) stop pointing at its real errors because the simulator behind them is missing a term, and find how many true-system experiments, chosen by which rule, bring them back.

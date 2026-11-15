@@ -182,3 +182,21 @@ def test_stream_seeds_are_independent():
     assert not np.allclose(a, b)
     assert not np.allclose(sobol_thetas(500, seed=stream_seed(3, "test")),
                            sobol_thetas(512, seed=stream_seed(4, "train"))[:500])
+
+
+def test_model_seeds_do_not_collide_across_roles_and_replications():
+    from mismatch.simulators import stream_seed
+    seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 101, 102, 997, 998, 999]
+    bases = []
+    for s in seeds:
+        bases += [stream_seed(s, "nominal"), stream_seed(s, "mc")]
+        bases += [stream_seed(s, "disc", n) for n in (8, 16, 32, 64)]
+        bases += [stream_seed(s, "fit", r) for r in range(7)]
+        bases += [stream_seed(s, "score", a * 100 + r) for a in range(1, 10) for r in range(7)]
+    members = [b * 100 + m for b in bases for m in range(5)]      # Ensemble member seeds
+    assert len(set(bases)) == len(bases)
+    assert len(set(members)) == len(members)
+    # the old arithmetic did collide: seed 8's nominal members equal seed 0's correction members
+    old_nominal_seed8 = {8 * 100 + m for m in range(5)}
+    old_disc_seed0_n8 = {(0 * 10000 + 8) * 100 + m for m in range(5)}
+    assert old_nominal_seed8 == old_disc_seed0_n8
