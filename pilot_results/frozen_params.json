@@ -1,0 +1,43 @@
+{
+ "eps_ref": {
+  "S1": 0.005438431125382092,
+  "S2": 0.0014023311655195923
+ },
+ "k": 1.0,
+ "spline_lam": 0.00010000000000000009,
+ "gp_components": 46,
+ "nominal_cfg": {
+  "n_hidden_layers": 4
+ },
+ "n_seeds": 20,
+ "provenance": {
+  "pilot_seeds": [
+   0,
+   101,
+   102
+  ],
+  "git_commit": "46819348b4420c57caab5c708d99cc1a690636a0",
+  "git_dirty": true,
+  "source_sha256": {
+   "mismatch/pilot.py": "faec8a8ff173953255d8d1b23c60c6733163b72ae900de4f0277125df6373c39",
+   "scripts/run_pilot.py": "3289c6704f5bf4850245c25694bba5fc8f922e8d4c27ea7c90c064d0a236508e",
+   "mismatch/surrogate.py": "a28044ed1222dbf59b0714851edba36a167b866d5ad2e1952bae11c69138966c",
+   "mismatch/acquisition.py": "8790418f78c2f98084d89e49a372b6eb7735f7dfe73a439b7d6f97965b9f471d",
+   "mismatch/acquisition_d.py": "209801b54192dbdb1248b8f83f8a911b7abcd66f992023910ecc9f0027931097",
+   "mismatch/dynamics.py": "4c705a54b1c6e1ff7ae42bf832530953271d98f664544cc295fa79583b51c869",
+   "mismatch/simulators.py": "54e5d8dbdfe6ed2be8f280ab6d4263f0203c462089153b5385fdf9ba542110a0",
+   "scripts/run_acquisition.py": "6e947f7ba05111dd5b395d4d04918c118904fc0c48dea318604b4851648c9727",
+   "scripts/run_rq1.py": "1e08fc0141332ac95971def3249499116748b88bbebf59ae53295170f2609fd3"
+  },
+  "stages": [
+   "aux",
+   "checks",
+   "eps",
+   "fcv",
+   "hyper",
+   "k",
+   "seeds"
+  ],
+  "notes": "gp_components set to 46 on 2026-11-20 from stage_checks.json (uncapped 99.9% rule, max over seeds and systems); the first finalize used a cap of 12 that the frozen rule does not have. The k stage ran with gp_components=None (99.9% per fit)."
+ }
+}

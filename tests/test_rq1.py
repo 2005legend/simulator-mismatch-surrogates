@@ -186,7 +186,8 @@ def test_phase_guard():
     check_phase([1, 10], "main", pred_tag_exists=True)
     with pytest.raises(SystemExit):
         check_phase([1], "main", pred_tag_exists=False)        # no pred-v1 tag yet
-    for bad in ([0], [11], [999]):
+    check_phase([11, 20], "main", pred_tag_exists=True)              # raised to 20 by the pilot
+    for bad in ([0], [21], [999]):
         with pytest.raises(SystemExit):
             check_phase(bad, "main", pred_tag_exists=True)
     with pytest.raises(SystemExit):

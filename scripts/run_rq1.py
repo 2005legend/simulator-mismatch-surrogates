@@ -5,7 +5,7 @@ the per-point arrays of each cell go to an npz file next to it. One file per see
 can run as separate processes without interleaving lines.
 
 Phases (addendum v1.6 and the plan): `dev` accepts only development seeds; `pilot` only
-0, 101, 102; `main` only 1-10 and refuses to start unless the git tag `pred-v1` exists.
+0, 101, 102; `main` only 1-20 (the seed-count rule raised 10 to 20) and refuses to start unless the git tag `pred-v1` exists.
 
 eps levels are multiples of eps_ref. Levels up to 2 x use all signals (prereg-v1). Levels
 above 2 x (addendum v1.5) run only at n_nom = 512 and compute the simulator-only signals
@@ -30,7 +30,7 @@ from mismatch.simulators import simulate_batch, sobol_thetas, stream_seed
 from mismatch.surrogate import Ensemble, FitConfig
 
 PILOT_SEEDS = {0, 101, 102}
-MAIN_SEEDS = set(range(1, 11))
+MAIN_SEEDS = set(range(1, 21))   # 1-10, raised to 20 by the pilot's seed-count rule (2026-11-20)
 FROZEN_MAX_MULT = 2.0
 EXTRA_NNOM = 512
 DEFAULT_MULTS = (0.0, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0)
@@ -55,7 +55,7 @@ def check_phase(seeds, phase, pred_tag_exists=None):
             raise SystemExit(f"the pilot phase accepts only seeds 0, 101, 102, not {sorted(seeds)}.")
     elif phase == "main":
         if not seeds <= MAIN_SEEDS:
-            raise SystemExit(f"the main phase accepts only seeds 1-10, not {sorted(seeds)}.")
+            raise SystemExit(f"the main phase accepts only seeds 1-20, not {sorted(seeds)}.")
         if pred_tag_exists is None:
             pred_tag_exists = _tag_exists("pred-v1")
         if not pred_tag_exists:

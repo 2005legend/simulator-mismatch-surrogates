@@ -1,0 +1,7 @@
+2026-11-19 23:11:28 start
+2026-11-20 00:01:19 pilot stages exit code 0
+2026-11-20 00:11:16 rq1 pilot seed index 0 exit code 0
+2026-11-20 00:11:22 rq1 pilot seed index 1 exit code 0
+2026-11-20 00:11:22 rq1 pilot seed index 2 exit code 0
+2026-11-20 00:11:22 all done
+2026-11-20 00:11:22 shutting down in 5 minutes (cancel: shutdown.exe -a)

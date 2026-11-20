@@ -98,7 +98,7 @@ def stage_aux(eps_ref, seeds, n_pts=56, n_nom=512, cfg=None, members=5):
         for s in SYSTEMS:
             y, _ = make_oracle(s, eps_ref[s], seed=seed)(x)
             lams.append(gcv_lambda(y[:10]))                      # 10 trajectories per cell
-            gp_k[s].append(pca_components(y - nominal.predict(x)[0]))
+            gp_k[s].append(pca_components(y - nominal.predict(x)[0], max_components=10 ** 6))  # no cap: frozen rule
     lam = float(np.exp(np.mean(np.log(lams))))                   # geometric mean over cells
     return {"spline_lam": lam, "spline_lam_all": lams, "gp_components_by_system": gp_k,
             "gp_components": int(max(max(v) for v in gp_k.values()))}
