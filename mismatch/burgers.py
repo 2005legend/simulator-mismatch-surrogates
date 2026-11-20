@@ -105,19 +105,23 @@ def from_unit(u):
     return BOX_LOW + np.asarray(u) * (BOX_HIGH - BOX_LOW)
 
 
-def residual_profile(pred, thetas):
-    """|u_t + u u_x - nu u_xx| of a predicted field on the output grid, per time point
-    (spectral x-derivatives, central differences in t), shape (n, N_OT - 2)."""
-    th = np.atleast_2d(thetas)
-    u = np.asarray(pred).reshape(-1, N_OT, N_OX)
-    k = np.fft.rfftfreq(N_OX, d=1.0 / N_OX)
+def residual_field(u, nu):
+    """RMS over x of u_t + u u_x - nu u_xx for fields u (n, n_t, n_x) on the output times T_OUT
+    (spectral x-derivatives, central differences in t); shape (n, n_t - 2)."""
+    n_x = u.shape[2]
+    k = np.fft.rfftfreq(n_x, d=1.0 / n_x)
     uh = np.fft.rfft(u, axis=2)
-    ux = np.fft.irfft(1j * k * uh, n=N_OX, axis=2)
-    uxx = np.fft.irfft(-(k ** 2) * uh, n=N_OX, axis=2)
+    ux = np.fft.irfft(1j * k * uh, n=n_x, axis=2)
+    uxx = np.fft.irfft(-(k ** 2) * uh, n=n_x, axis=2)
     ut = (u[:, 2:] - u[:, :-2]) / (2 * (T_OUT[1] - T_OUT[0]))
-    nu = th[:, 0][:, None, None]
-    r = ut + (u * ux - nu * uxx)[:, 1:-1]
+    r = ut + (u * ux - np.asarray(nu, float).reshape(-1, 1, 1) * uxx)[:, 1:-1]
     return np.sqrt(np.mean(r ** 2, axis=2))
+
+
+def residual_profile(pred, thetas):
+    """Residual of a predicted System 3 field (flattened, N_OUT values) per time point."""
+    th = np.atleast_2d(thetas)
+    return residual_field(np.asarray(pred).reshape(-1, N_OT, N_OX), th[:, 0])
 
 
 def residual_score(pred, thetas):
