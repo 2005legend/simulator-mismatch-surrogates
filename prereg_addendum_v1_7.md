@@ -1,6 +1,6 @@
 # Pre-registration addendum v1.7: Blind to the Missing Term (PDE systems)
 
-Drafted 2026-11-20. Status: **DRAFT, not frozen.** It will be frozen by the git commit tagged `prereg-v1.7` after the author's review, and before any PDE run on a pilot or main seed. It adds two systems; nothing in `prereg-v1` to `prereg-v1.6` or `pred-v1` changes.
+Drafted 2026-11-20. Status: **frozen 2026-11-20** by the git commit tagged `prereg-v1.7`, after the author's approval of the draft as written (20 seeds, System 4 included, all PDE tests secondary), and before any PDE run on a pilot or main seed. It adds two systems; nothing in `prereg-v1` to `prereg-v1.6` or `pred-v1` changes.
 
 **Scope.** (1) Disclosure of the PDE development looks (dev seed 999 only). (2) Systems 3 and 4: definitions and settings. (3) A pilot on seed 0 that sets eps_ref and freezes predictions `pred-v2` before any main PDE run. (4) The RQ1-type sweep, signals and metrics on the PDE systems. (5) Tests and predictions, all secondary to the pendulum's frozen families, with one new Holm family. No acquisition on the PDE systems.
 
