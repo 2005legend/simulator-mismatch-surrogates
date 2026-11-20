@@ -54,6 +54,7 @@ class Member:
         self.y_mean = self.y_std = None
         self.fit_seconds = None
         self.epochs_run = None
+        self.best_val = None            # lowest validation loss reached
 
     def fit(self, thetas, y):
         cfg, rng = self.cfg, np.random.default_rng(self.seed)
@@ -96,6 +97,7 @@ class Member:
             self.net.load_state_dict(best_state)
         self.fit_seconds = time.perf_counter() - start
         self.epochs_run = epoch + 1
+        self.best_val = float(best)
         return self
 
     def predict_mc(self, thetas, n_passes=50, seed=0):
@@ -216,6 +218,7 @@ class Ensemble:
                 lin.weight.data.copy_(w.T)
                 lin.bias.data.copy_(b[0])
             mem.fit_seconds, mem.epochs_run = total, int(epochs_run[m])
+            mem.best_val = float(best[m])
         return self
 
     def member_predictions(self, thetas):

@@ -107,9 +107,16 @@ def main():
     ap.add_argument("--k", type=float, help="batch exponent from the pilot")
     ap.add_argument("--eps-ref-s1", type=float)
     ap.add_argument("--eps-ref-s2", type=float)
+    ap.add_argument("--params", help="frozen_params.json from the pilot")
     ap.add_argument("--out-dir", default=None)
     args = ap.parse_args()
     check_phase(args.seeds, args.phase)
+    extra = {}
+    if args.params:
+        from scripts.run_pilot import load_params
+        fp = load_params(args.params)
+        args.eps_ref_s1, args.eps_ref_s2, args.k = fp["eps_ref"]["S1"], fp["eps_ref"]["S2"], fp["k"]
+        extra = {"nominal_cfg": fp["nominal_cfg"], "problem_kw": fp["problem_kw"]}
     if args.phase == "dev":
         eps_ref = {"S1": args.eps_ref_s1 or DEV_EPS_REF["S1"], "S2": args.eps_ref_s2 or DEV_EPS_REF["S2"]}
         k = args.k if args.k is not None else 1.0
@@ -119,7 +126,7 @@ def main():
         eps_ref, k = {"S1": args.eps_ref_s1, "S2": args.eps_ref_s2}, args.k
     mults = args.mults or (FAMILY_A_MULTS if args.family == "A" else FAMILY_F_MULTS)
     out_dir = args.out_dir or os.path.join("runs", f"acq_{args.phase}")
-    run(args.family, args.seeds, args.systems, mults, eps_ref, out_dir, k=k)
+    run(args.family, args.seeds, args.systems, mults, eps_ref, out_dir, k=k, **extra)
 
 
 if __name__ == "__main__":

@@ -142,9 +142,16 @@ def main():
     ap.add_argument("--mults", type=float, nargs="+", default=list(DEFAULT_MULTS))
     ap.add_argument("--eps-ref-s1", type=float)
     ap.add_argument("--eps-ref-s2", type=float)
+    ap.add_argument("--params", help="frozen_params.json from the pilot")
     ap.add_argument("--out-dir", default=None)
     args = ap.parse_args()
     check_phase(args.seeds, args.phase)
+    extra = {}
+    if args.params:
+        from scripts.run_pilot import load_params
+        fp = load_params(args.params)
+        args.eps_ref_s1, args.eps_ref_s2 = fp["eps_ref"]["S1"], fp["eps_ref"]["S2"]
+        extra = {"nominal_cfg": fp["nominal_cfg"]}
     if args.phase == "dev":
         eps_ref = {"S1": args.eps_ref_s1 or DEV_EPS_REF["S1"],
                    "S2": args.eps_ref_s2 or DEV_EPS_REF["S2"]}
@@ -153,7 +160,7 @@ def main():
             raise SystemExit("pilot and main phases need --eps-ref-s1 and --eps-ref-s2 from the pilot.")
         eps_ref = {"S1": args.eps_ref_s1, "S2": args.eps_ref_s2}
     out_dir = args.out_dir or os.path.join("runs", f"rq1_{args.phase}")
-    run(args.seeds, args.n_nom, args.systems, args.mults, eps_ref, out_dir)
+    run(args.seeds, args.n_nom, args.systems, args.mults, eps_ref, out_dir, **extra)
 
 
 if __name__ == "__main__":
