@@ -69,6 +69,8 @@ Status: v2, 2026-11-04. Scope option B approved by the author on 2026-11-04. Rep
 
 - 2026-11-20: **Seed-count decision.** The frozen rule raised the main-run seed count from 10 to 20 (pilot power 0.9% at 10). The author chose to follow it exactly (20 seeds for every family) rather than run 10 and log a deviation. What matters: the pilot A1 slope is near zero, so even 20 seeds give about 1% power and A1 is most likely null; it will be reported as a null with an equivalence bound, not as evidence of no effect beyond that bound. Cost: the pilot ran about 3 x faster than estimated, so 20 seeds is about one overnight on 8 workers. The phase guard now accepts seeds 1-20. Pilot outputs copied to `pilot_results/` (runs/ is not tracked); `run_pilot.py` aux stage no longer caps the GP count (the pilot itself ran with the cap; see the entry above).
 
+- 2026-11-20: **Model A and `pred-v1`.** Predictions computed from pilot seed 0 (about 28 min) and frozen. Primary P-A (nominal ensemble sigma, exact d, seed-0 plug-in after the fallback fired): r_1/2 S1 0.912 (AUROC rises 0.74 to 0.94: aligned), S2 2.589 (AUROC falls 0.70 to 0.34: blind, then below chance). Collapse across n_nom not predicted. P-C: S2 t* > 10 s at all four levels; S1 not applicable. Decisions and reasons in `preregistration.md` section 11. Next: main runs on seeds 1-20.
+
 ## Project goal
 
 Measure when the signals used to judge a physics surrogate (ensemble spread, conformal intervals calibrated on simulations, the residual of the governing equation) stop pointing at its real errors because the simulator behind them is missing a term, and find how many true-system experiments, chosen by which rule, bring them back.
