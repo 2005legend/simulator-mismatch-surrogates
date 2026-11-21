@@ -1,6 +1,6 @@
 # Experimental log: Blind to the Missing Term
 
-All numbers below are copied from the committed results files `results_main.md` (pendulum) and `results_pde.md` (PDE systems) of the project repository. Do not round them further or change them. Do not add results that are not here.
+All numbers below are copied from the committed results files `results_main.md` (pendulum), `results_pde.md` (PDE systems), `results_pde_ood.md` (out-of-dictionary terms) and `theory/ranking_proof.md` (numerical check of the bound) of the project repository. Do not round them further or change them. Do not add results that are not here.
 
 ## 1. Pre-registration trail
 
@@ -13,6 +13,7 @@ All numbers below are copied from the committed results files `results_main.md` 
 | pred-v1 | 2026-11-20 | Transition predictions from pilot seed 0 (pendulum) |
 | prereg-v1.7 | 2026-11-20 | PDE Systems 3 and 4, Family P (PB1), PA2, PD1, PR1, PR1s, PR3a, PR3b; all PDE tests secondary |
 | pred-v2 | 2026-11-20 | Transition predictions from pilot seed 0 (PDE) |
+| prereg-v1.8 | 2026-11-21 | Written after all earlier results were seen (stated in the addendum). Out-of-dictionary terms P3 = -u_x, P4 = u_xx on System 3; tests OB1 (Holm over 2), OD1, OR1, OR1L, OR3; all secondary (family O). Pilot seed 0 sets eps_ref only; no transition prediction frozen |
 
 Seeds: development 997-999 (never in results), pilot 0, 101, 102, main 1-20. The pilot's seed-count rule gave 20 main seeds. "k of 10" criteria are read as "2k of 20". Deviations are logged in section 11 of the pre-registration, each before the affected result was examined; one is that the original RQ1 grid script missed the n_nom = 128 and 2048 cells, which were added and run before any eps > 0 result was examined.
 
@@ -149,6 +150,38 @@ All four combinations: PR1, PR1s (4x and 16x), PR3a (beats sigma and >= 0.90) an
 
 - Conformal intervals calibrated on nominal simulations cover 0% of true errors at 16 x in all four PDE combinations; calibrated on 16 real fields they cover 94.2% to 96.9%.
 - D3 on the PDE systems (low power, no prediction): at 16 x, aligned in 0 to 4 of 20 seeds for n = 8 to 64.
+
+## 4b. Out-of-dictionary terms (System 3, addendum v1.8, 20 seeds; all secondary)
+
+P3 adds eps * (-u_x) (uniform drift), P4 adds eps * u_xx (extra diffusion; equals raising nu by eps). Neither is in the nine-term dictionary, which holds local functions of u and x only. Median share of each term's response outside the dictionary's span: P3 0.36, P4 0.22. eps_ref (pilot seed 0): P3 0.002216, P4 0.002062. Levels {0, 0.25, 0.5, 1, 2, 4, 8, 16} x eps_ref, MLP ensemble, n_nom = 512.
+
+| Test | P3 | P4 |
+|---|---|---|
+| OB1: slope of ensemble-sigma AUROC on log r < 0 | -0.0401, CI [-0.0427, -0.0377], Holm p 3.1e-17, 0/20 positive: **supported** | -0.0334, CI [-0.0365, -0.0309], Holm p 2.8e-15, 0/20 positive: **supported** |
+| OD1: rho_S(sigma, E) - rho_S(sigma, D) at 16 x, TOST +/- 0.10 | 0.0245: **equivalent** | 0.0052: **equivalent** |
+| OR1: inside the full-dictionary range at 16 x (sigma; residual) | 20/20; 20/20: **met** | 20/20; 20/20: **met** |
+| OR1L: abs(rho_S(s, D) - rho_S(s, ||L[h]||)) <= 0.10 (sigma; residual) | 20/20, largest gap 0.0004; 20/20, 0.0003: **met** | 20/20, 0.0062; 20/20, 0.0040: **met** |
+| OR3: term chosen from 16 real fields at 4 x beats sigma | 19/20: **met** | 9/20: **not met** (predicted before the run) |
+
+- OR1 range widths (same for both terms, since the range does not depend on the true term): 1.01 of 2 for sigma, 1.30 for the residual. Chance that a uniformly placed value lands inside in 18 or more of 20 seeds: 0.0002 (sigma) and 0.013 (residual). Report these next to the counts: containment in a range this wide is weak evidence.
+- Mean rho_S(sigma, D) at 16 x: P3 0.325, P4 0.508; from the linear response alone: 0.325 and 0.504. Residual: P3 0.210 vs 0.210, P4 0.331 vs 0.329.
+- OR3 selections at n = 16: P3 u^2 11, u|u| 6, u^3 1, sin 3x 1, u sin x 1; P4 sin 3x 17, cos 3x 3. Median statistic vs sigma: P3 0.590 vs 0.329; P4 0.503 vs 0.505. Beats-sigma counts at n = 8, 16, 32, 64: P3 20, 19, 20, 20; P4 1, 9, 9, 9 (more data does not help on P4).
+- Mean ensemble-sigma AUROC at 0, 1, 4, 16 x: P3 0.943, 0.950, 0.868, 0.798; P4 0.943, 0.936, 0.863, 0.824.
+- Conformal at 16 x: nominal-calibrated 0.0% coverage on both terms; calibrated on 16 real fields 96.8% (P3), 97.4% (P4).
+- D3 at 16 x, aligned seeds at n = 8, 16, 32, 64: P3 2, 2, 9, 19; P4 8, 12, 18, 20.
+
+## 4c. Numerical check of Proposition 1(a) (post hoc, pendulum, ensemble sigma, n_nom = 512, 20 seeds)
+
+| System | Level | Observed abs(tau(s,E) - tau(s,D)), mean / max | Bound 2 q_D, mean |
+|---|---|---|---|
+| S1 | 1 x | 0.061 / 0.143 | 1.46 (vacuous) |
+| S1 | 4 x | 0.052 / 0.094 | 0.84 |
+| S1 | 16 x | 0.026 / 0.038 | 0.43 |
+| S2 | 1 x | 0.240 / 0.305 | 1.98 (vacuous) |
+| S2 | 4 x | 0.059 / 0.127 | 1.17 (vacuous) |
+| S2 | 16 x | 0.006 / 0.017 | 0.42 |
+
+The bound holds in every seed and is loose by about 10 x at 16 x.
 
 ## 5. Not run (cut before any registered-seed result, with reason in the pre-registration)
 

@@ -72,7 +72,7 @@ Mean ensemble-sigma AUROC by level (x eps_ref):
 
 D3 at 16 x (seeds aligned, of 20) by number of real points: P3 2, 2, 9, 19 and P4 8, 12, 18, 20 at n = 8, 16, 32, 64.
 
-Coverage at 16 x: conformal intervals calibrated on nominal simulations cover 0.0% of true outputs (both terms); intervals calibrated on real data cover 96.8% (P3) and 97.4% (P4), nominal 95%.
+Coverage at 16 x: conformal intervals calibrated on nominal simulations cover 0.0% of true outputs (both terms); intervals calibrated on 16 real fields cover 96.8% (P3) and 97.4% (P4).
 
 ## Summary
 
