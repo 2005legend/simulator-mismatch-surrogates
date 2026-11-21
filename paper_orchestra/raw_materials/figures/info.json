@@ -1,0 +1,16 @@
+[
+ {"name": "fig1_transition.png",
+  "caption": "Pendulum, nominal ensemble sigma: AUROC for the large-error event against r = median ||d|| / median ||a|| (n_nom = 512, levels 0.25 to 16 x eps_ref). Blue: mean of 20 seeds with 95% interval; orange dashed: prediction from pilot seed 0 (pred-v1). On S1 (quadratic drag) the AUROC rises with r; on S2 (Coulomb friction) it falls below 0.5. The predicted midpoints lie within a factor 1.5 of the observed ones but outside the 20-seed 90% CI on both systems."},
+ {"name": "fig2_collapse.png",
+  "caption": "Pendulum, nominal ensemble sigma: AUROC against r for surrogates trained on n_nom = 128, 512 and 2048 simulations (levels 0 to 2 x eps_ref, mean of 20 seeds, 95% intervals). Curves from different training sizes fall on one curve in r, so r, not eps alone, sets the ranking."},
+ {"name": "fig3_alignment.png",
+  "caption": "Pendulum, 16 x eps_ref: Spearman correlation of each signal with the discrepancy norm ||d|| per seed (blue dots, 20 seeds), the alignment range computed from a nine-term dictionary and 2,000 mixtures (grey bar), and the prediction from the true term family (orange tick). The observed value is inside the range in 20 of 20 seeds and within 0.15 of the true-family prediction."},
+ {"name": "fig4_selection.png",
+  "caption": "Pendulum, 4 x eps_ref: Spearman correlation with ||d|| of the dictionary term selected from n noisy real trajectories (median of 20 seeds), with the full dictionary (blue) and with the true term family removed (orange), against nominal ensemble sigma (green dashed). Eight real trajectories already select a term that ranks the discrepancy better than sigma."},
+ {"name": "fig5_acquisition.png",
+  "caption": "Pendulum acquisition (Family A): G = log(budget-AUC of the arm / budget-AUC of Sobol) for arm 3 (nominal ensemble sigma) and arm 4 (nominal ODE residual) against r, mean of 20 seeds with 95% intervals. G > 0 means worse than Sobol: both guided arms are worse than Sobol at every level on both systems. The gap grows with r on S1 and shrinks on S2."},
+ {"name": "fig6_pde_transition.png",
+  "caption": "PDE systems, nominal ensemble sigma: AUROC against r for Burgers with an MLP ensemble (top) and with a Fourier neural operator ensemble (bottom), missing term P1 = -u|u| (left) or P2 = sin 3x (right). Blue: mean of 20 seeds with 95% interval; orange dashed: pilot seed 0 (pred-v2). The predicted midpoint falls inside the 20-seed CI only for Burgers P1."},
+ {"name": "fig7_pde_alignment.png",
+  "caption": "PDE systems, 16 x eps_ref: Spearman correlation with ||d|| of ensemble sigma and of the PDE residual per seed (blue dots, 20 seeds), the dictionary alignment range (grey bar) and the true-family prediction (orange tick). All values lie inside the range; the largest gap to the true-family prediction is 0.07. The PDE residual is aligned with the discrepancy for P1 on Burgers and anti-aligned for P2."}
+]

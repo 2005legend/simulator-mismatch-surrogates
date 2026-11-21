@@ -22,3 +22,7 @@ papers/
 Thumbs.db
 .vscode/
 .idea/
+
+# secrets
+.env
+*.env
