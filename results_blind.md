@@ -60,7 +60,7 @@ The slope is descriptive (no directional test was frozen, because the dev look s
 - BLR1L at 16 x: expected not met on constant torque, borderline on pivot vibration, met on the others; not met on constant torque (0/20), met on pivot vibration (largest gap 0.071) and on the others.
 - BLR3s: expected met on aerodynamic drag, forcing sin 3x, cubic damping and quadratic damping, not met on pivot vibration, uncertain on constant torque. Met on forcing sin 3x, cubic damping and constant torque; **not met on aerodynamic drag (15/20) and quadratic damping (15/20), contrary to expectation**; not met on pivot vibration (0/20), as expected. In the failing seeds the observations selected a weaker library term (w or p w^2 instead of w^3; u u_x instead of u^3).
 - Range containment is weak evidence on the pendulum (reference p 0.080 for sigma, 0.037 for the residual) and stronger for sigma on Burgers (0.001).
-- The draw repeated constant torque, already tested in v1.9 (Q1). With the same seeds, term and eps rule, its limit, AUROC and linear-response results reproduce v1.9 exactly; it adds a consistency check, not new evidence. Its range and selection results are new (blind library).
+- **Three of the six drawn terms repeat earlier missing terms**, because the pools included them: constant torque (= Q1 of v1.9), forcing sin 3x (= P2 of v1.7) and quadratic damping (= P1 of v1.7). With the same seeds, terms and eps rule, their limit, AUROC and linear-response results reproduce the earlier runs exactly (for example the same eps_ref, 0.006059 and 0.003596); they add a consistency check, not new evidence. Their blind-library range and selection results are new. Genuinely new missing terms: aerodynamic drag, pivot vibration, cubic damping.
 
 ## Descriptive
 
