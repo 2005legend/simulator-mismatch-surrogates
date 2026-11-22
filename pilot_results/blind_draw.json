@@ -1,0 +1,39 @@
+{
+ "tag": "prereg-v1.10a",
+ "commit": "df14e5c3da49d464e846fc30e802b04a4a1b9e8e",
+ "seed_hex": "df14e5c3da49",
+ "pendulum": [
+  "aerodynamic drag",
+  "pivot vibration",
+  "constant torque"
+ ],
+ "burgers": [
+  "forcing sin 3x",
+  "cubic damping",
+  "quadratic damping"
+ ],
+ "pendulum_order": [
+  "aerodynamic drag",
+  "pivot vibration",
+  "constant torque",
+  "periodic drive",
+  "offset restoring",
+  "linear damping",
+  "quadratic drag",
+  "Stribeck friction",
+  "Coulomb friction",
+  "cubic spring"
+ ],
+ "burgers_order": [
+  "forcing sin 3x",
+  "cubic damping",
+  "quadratic damping",
+  "localized source",
+  "extra viscosity",
+  "varying viscosity",
+  "saturating damping",
+  "linear damping",
+  "drift",
+  "forcing cos 2x"
+ ]
+}
