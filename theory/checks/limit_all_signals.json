@@ -152,5 +152,47 @@
   "spearman_max_abs": 0.025867975471901894,
   "kendall_mean": 0.0037154308617234426,
   "kendall_max_abs": 0.019126252505010016
+ },
+ "P_Q1:ens_sigma": {
+  "n": 20,
+  "spearman_mean": 0.03759594878379513,
+  "spearman_max_abs": 0.06633338533354138,
+  "kendall_mean": 0.02808096192384769,
+  "kendall_max_abs": 0.05127054108216439
+ },
+ "P_Q1:mc_sigma": {
+  "n": 20,
+  "spearman_mean": 0.019788443953775804,
+  "spearman_max_abs": 0.04708943635774543,
+  "kendall_mean": 0.01777875751503006,
+  "kendall_max_abs": 0.04040080160320636
+ },
+ "P_Q1:pde_resid": {
+  "n": 20,
+  "spearman_mean": 0.035082356329425315,
+  "spearman_max_abs": 0.06874088296353184,
+  "kendall_mean": 0.025087775551102198,
+  "kendall_max_abs": 0.04835270541082162
+ },
+ "P_Q2:ens_sigma": {
+  "n": 20,
+  "spearman_mean": 0.04450831723326894,
+  "spearman_max_abs": 0.061974487897951624,
+  "kendall_mean": 0.03709659318637274,
+  "kendall_max_abs": 0.04843286573146294
+ },
+ "P_Q2:mc_sigma": {
+  "n": 20,
+  "spearman_mean": 0.01681327205308822,
+  "spearman_max_abs": 0.03311043644174583,
+  "kendall_mean": 0.016133066132264517,
+  "kendall_max_abs": 0.026308617234468867
+ },
+ "P_Q2:pde_resid": {
+  "n": 20,
+  "spearman_mean": 0.04234883179532718,
+  "spearman_max_abs": 0.06130181320725281,
+  "kendall_mean": 0.03257074148296593,
+  "kendall_max_abs": 0.045579158316633256
  }
 }

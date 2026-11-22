@@ -1,5 +1,5 @@
 """Post hoc, exploratory (2026-11-22): at 16 x eps_ref, rho(s, E) - rho(s, D) for every signal,
-in Spearman's rho and Kendall's tau, over seeds 1-20, for all eight system-term cases.
+in Spearman's rho and Kendall's tau, over seeds 1-20, for all system-term cases (eight; P_Q1 and P_Q2 added 2026-11-22 after v1.9).
 The pre-registered tests (D1, PD1, OD1) covered ensemble sigma only. Output: limit_all_signals.json."""
 import json, os
 import numpy as np
@@ -10,7 +10,9 @@ CASES = {"S1": ("runs/rq1_main/arrays/seed{k}_n512_S1_x16.npz", ("ens_sigma", "m
          **{c: (f"runs/pde_main/arrays/seed{{k}}_{c}_x16.npz", ("ens_sigma", "mc_sigma", "pde_resid"))
             for c in ("B_P1", "B_P2", "O_P1", "O_P2")},
          **{c: (f"runs/pde_ood_main/arrays/seed{{k}}_{c}_x16.npz", ("ens_sigma", "mc_sigma", "pde_resid"))
-            for c in ("B_P3", "B_P4")}}
+            for c in ("B_P3", "B_P4")},
+         **{c: (f"runs/pend_ood_main/arrays/seed{{k}}_{c}_x16.npz", ("ens_sigma", "mc_sigma", "pde_resid"))
+            for c in ("P_Q1", "P_Q2")}}
 out = {}
 for case, (pat, sigs) in CASES.items():
     for s in sigs:

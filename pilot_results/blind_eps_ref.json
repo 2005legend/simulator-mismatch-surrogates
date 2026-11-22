@@ -1,0 +1,12 @@
+{
+ "P": {
+  "aerodynamic_drag": 0.007882009661813518,
+  "pivot_vibration": 0.011082741836055784,
+  "constant_torque": 0.005310411478883103
+ },
+ "B": {
+  "forcing_sin_3x": 0.006059170555227779,
+  "cubic_damping": 0.003600915340501052,
+  "quadratic_damping": 0.00359616248557834
+ }
+}
