@@ -68,3 +68,51 @@ The same design as v1.8 and v1.9, with the blind library as the dictionary: eps_
 - **Options considered:** both systems with 3 drawn terms each (chosen by the author, 2026-11-22); the pendulum only with 4 terms (cheaper, one system); both systems with 5 terms each (firmer rate, about 1.5 days).
 - **Most likely outcome (stated now):** in-span terms bracket and are selected well; out-of-span terms bracket mainly because the range is wide, and selection often fails when no library term behaves like the missing one.
 - **What cannot be known yet:** which terms the draw will give, and whether any of them needs the redraw rule.
+
+## Part B
+
+Drafted 2026-11-22 after the draw and a development look on seed 999; **frozen 2026-11-22** by tag `prereg-v1.10b` after the author approved it as drafted, before any run on pilot seed 0 or main seeds 1-20.
+
+### B1. The draw (`pilot_results/blind_draw.json`, from commit df14e5c3da49)
+
+- Pendulum: aerodynamic drag, pivot vibration, constant torque.
+- Burgers: forcing sin 3x, cubic damping, quadratic damping.
+- No redraw was needed: all six ran at every level with the frozen solvers on the dev seed, and every eps_ref bisection converged inside its bracket (pendulum [1e-6, 0.1], Burgers [1e-5, 0.5]).
+
+### B2. Disclosure: development look (dev seed 999 only)
+
+`scripts/run_blind.py --phase dev`, all stages, output `runs/blind_dev*`.
+
+| Drawn term | Rough eps_ref | Out-of-span share vs blind library (median) | sigma AUROC at 0 / 16 x | rho(sigma,E) - rho(sigma,D) at 16 x | Linear gap (sigma) 4 x / 16 x | Selected term (n = 16), its statistic vs sigma's |
+|---|---|---|---|---|---|---|
+| P aerodynamic drag | 0.0075 | 0.00 | 0.60 / 0.94 | -0.012 | 0.001 / 0.000 | w^3, 0.94 vs 0.80 |
+| P pivot vibration | 0.0104 | 0.15 | 0.60 / 0.67 | 0.026 | 0.016 / 0.074 | sin p, 0.56 vs -0.12 |
+| P constant torque | 0.0050 | 0.00 | 0.60 / 0.22 | 0.011 | 0.041 / 0.142 | cos p, 0.90 vs -0.35 |
+| B forcing sin 3x | 0.0063 | 0.64 | 0.89 / 0.60 | 0.013 | 0.000 / 0.001 | 1, 0.93 vs 0.03 |
+| B cubic damping | 0.0037 | 0.00 | 0.89 / 0.74 | 0.008 | 0.002 / 0.005 | u^3, 1.00 vs 0.32 |
+| B quadratic damping | 0.0037 | 0.01 | 0.89 / 0.79 | 0.009 | 0.000 / 0.000 | u^3, 0.95 vs 0.28 |
+
+Blind-range widths (of a possible 2): pendulum 1.56 (sigma) and 1.37 (residual); Burgers 1.17 (sigma) and 1.42 (residual). The observed value was inside the range for every term and signal.
+
+Readings stated before any registered run:
+
+- **The A2 span classification was too coarse.** Classified there by function form, constant torque, aerodynamic drag and quadratic damping are "not in the span"; measured by response, they lie almost entirely inside it (probably because the responses to cos p, w^3, and u with u^3 are close to those of a constant torque, of w|w|^0.5 and of u|u|; not investigated further). Only forcing sin 3x (0.64) and pivot vibration (0.15) are substantially outside. The paper reports the measured share, and says that a generic library covered most drawn terms.
+- **The direction of the effect differs by term** (sigma AUROC rises under aerodynamic drag, stays near flat under pivot vibration, falls under the other four), so no directional slope test is frozen; the slope is reported descriptively.
+- **"Beats sigma" is weak when sigma is near zero or negative** (pivot vibration, constant torque, forcing sin 3x), so a stricter criterion from v1.6 (R3a) is added: the selected term's statistic is at least 0.90.
+- **Range containment is weak evidence on the pendulum:** with width 1.56, a uniformly placed value lands inside in 18 or more of 20 seeds with probability 0.15.
+
+### B3. Tests (all secondary; family BL)
+
+Per drawn term, seeds 1-20, "at least 18 of 20" for counts. Signals for range and linear-response tests: ensemble sigma and the residual (ODE on the pendulum, PDE on Burgers).
+
+- **BL1 (limit):** at 16 x, rho_S(sigma, E) - rho_S(sigma, D) within +/- 0.10, TOST across seeds. Expectation: met on all six.
+- **BLR1 (bracketing by the blind library):** at 16 x, rho_S(signal, D) inside the blind-library range (single terms and 2,000 mixtures) in at least 18 of 20 seeds. Reported with the mean width and the reference probability. Expectation: met on all six, uninformative on the pendulum (reference p about 0.15 for sigma) and weakly informative on Burgers (about 0.002 for sigma, 0.04 for the residual).
+- **BLR1L (linear-response mechanism):** abs(rho_S(signal, D) - rho_S(signal, ||L[h]||)) <= 0.10 in at least 18 of 20 seeds, at 4 x and at 16 x. Expectation: met at 4 x on all six; at 16 x not met on constant torque (as in v1.9), borderline on pivot vibration (dev 0.074), met on the others.
+- **BLR3 (selection beats sigma):** the blind-library term selected from 16 noisy observations at 4 x has rho_S(term response norm, D) greater than ensemble sigma's in at least 18 of 20 seeds. Expectation: met on all six.
+- **BLR3s (selection finds a well-aligned term):** the same selected term's statistic is at least 0.90 in at least 18 of 20 seeds. Expectation: met on aerodynamic drag, forcing sin 3x, cubic damping and quadratic damping; not met on pivot vibration (dev 0.56); uncertain on constant torque (dev 0.903, at the threshold).
+- **Summary count (reported first):** the number of the six drawn terms meeting each of BL1, BLR1, BLR1L (4 x and 16 x), BLR3 and BLR3s, next to the corresponding hand-written-dictionary results of v1.6-v1.9.
+- **Descriptive:** slope of sigma AUROC on log r and its sign; measured out-of-span share; selected terms at n = 8, 16, 32, 64; coverage of 90% conformal intervals calibrated on nominal simulations and on 16 noisy observations; eps_ref.
+
+### B4. Compute and order
+
+About 7 to 10 minutes per seed per system for cells and 2 minutes for alignment: about 3 to 4 hours for both systems, four processes per system run one system after the other. Order: freeze part B (tag `prereg-v1.10b`); pilot seed 0 (eps_ref only, both systems); seeds 1-20; alignment; analysis. Nothing is cut if compute runs short; the run is resumable.

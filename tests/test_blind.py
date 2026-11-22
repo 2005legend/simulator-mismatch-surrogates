@@ -54,3 +54,15 @@ def test_libraries_give_responses():
     assert len(names) == 13 and np.all(np.isfinite(resp))
     names, resp, _ = B.term_responses(burg_thetas(4, 3), terms=BL.BURG_LIB)
     assert len(names) == 12 and np.all(np.isfinite(resp))
+
+
+def test_blind_runner_phase_guard():
+    import pytest
+    from scripts.run_blind import check_phase, slug, unslug
+    check_phase([999], "dev")
+    with pytest.raises(SystemExit):
+        check_phase([3], "dev")
+    with pytest.raises(SystemExit):
+        check_phase([0], "pilot", tag_ok=False)
+    check_phase([1, 20], "main", tag_ok=True)
+    assert unslug(slug("pivot vibration")) == "pivot vibration"
