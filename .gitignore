@@ -38,3 +38,4 @@ build_v*.log
 # Paper drafts stay local (repo is the evidence trail, not the manuscript)
 paper/
 submissions/ascml2027/abstract_ascml.*
+submissions/
